@@ -1,18 +1,21 @@
 package users
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/ChrisBryann/go-ecommerce/services/auth"
 	"github.com/ChrisBryann/go-ecommerce/types"
 	"github.com/ChrisBryann/go-ecommerce/utils"
 	"github.com/gorilla/mux"
 )
 
 type Handler struct {
+	store types.UserStore
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(store types.UserStore) *Handler {
+	return &Handler{store: store}
 }
 
 func (h *Handler) RegisterRoutes(router *mux.Router) {
@@ -33,6 +36,29 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, err)
 	}
 	// check if the user exists
-	// if it doesnt, we create the new user
+	_, err := h.store.GetUserByEmail(payload.Email)
+	if err == nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", payload.Email))
+		return
+	}
+	// hash the password
+	hashedPassword, err := auth.HashPassword(payload.Password)
 
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// if it doesnt, we create the new user
+	err = h.store.CreateUser(types.User{
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		Email:     payload.Email,
+		Password:  hashedPassword,
+	})
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+	utils.WriteJSON(w, http.StatusCreated, nil)
 }
