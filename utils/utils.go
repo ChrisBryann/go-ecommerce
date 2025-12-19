@@ -4,7 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
+
+// New() returns a singleton instance that can be used throughout lifetime of app
+// enables caching
+var Validate = validator.New()
 
 func ParseJSON(r *http.Request, payload any) error {
 	if r.Body == nil {
