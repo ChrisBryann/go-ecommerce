@@ -1,6 +1,8 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type UserStore interface { // why interface? to define methods and not stored values
 	GetUserByEmail(email string) (*User, error)
@@ -11,6 +13,8 @@ type UserStore interface { // why interface? to define methods and not stored va
 type ProductStore interface {
 	CreateProduct(Product) error
 	GetProducts() ([]*Product, error)
+	GetProductsByID(productIDs []int) ([]Product, error)
+	UpdateProduct(Product) error
 }
 
 type OrderStore interface {
@@ -25,6 +29,15 @@ type Order struct {
 	Status    string    `json:"status"`
 	Address   string    `json:"address"`
 	CreatedAt time.Time `json:"createdAt"`
+}
+
+type CartItem struct {
+	ProductID int `json:"productId"`
+	Quantity  int `json:"quantity"`
+}
+
+type CartCheckoutPayload struct {
+	Items []CartItem `json:"items" validate:"required"`
 }
 
 type OrderItem struct {
@@ -56,11 +69,11 @@ type Product struct {
 }
 
 type CreateProductPayload struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Image       string  `json:"image"`
-	Price       float64 `json:"price"`
-	Quantity    int     `json:"quantity"` // not good, because with concurrent requests, this field will be modified a lot and become false.
+	Name        string  `json:"name" validate:"required"`
+	Description string  `json:"description" validate:"required"`
+	Image       string  `json:"image" validate:"required"`
+	Price       float64 `json:"price" validate:"required"`
+	Quantity    int     `json:"quantity" validate:"required"` // not good, because with concurrent requests, this field will be modified a lot and become false.
 }
 
 type RegisterUserPayload struct {

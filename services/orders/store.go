@@ -1,4 +1,4 @@
-package cart
+package orders
 
 import (
 	"database/sql"

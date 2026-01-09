@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ChrisBryann/go-ecommerce/services/cart"
+	"github.com/ChrisBryann/go-ecommerce/services/orders"
 	"github.com/ChrisBryann/go-ecommerce/services/products"
 	"github.com/ChrisBryann/go-ecommerce/services/users"
 	"github.com/gorilla/mux"
@@ -33,6 +35,11 @@ func (s *APIServer) Run() error {
 	productsStore := products.NewStore(s.db)
 	productsHandler := products.NewHandler(productsStore)
 	productsHandler.RegisterRoutes(subrouter)
+
+	ordersStore := orders.NewStore(s.db)
+
+	cartHandler := cart.NewHandler(ordersStore, productsStore, usersStore)
+	cartHandler.RegisterRoutes(subrouter)
 
 	log.Println("Listening on", s.addr)
 
