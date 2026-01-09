@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS order_items (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    orderId BIGINT NOT NULL REFERENCES orders(id),
+    productId BIGINT NOT NULL REFERENCES products(id),
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

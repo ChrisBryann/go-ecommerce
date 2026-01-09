@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
@@ -13,7 +12,8 @@ type Config struct {
 	Port                   string
 	DBUser                 string
 	DBPassword             string
-	DBAddress              string
+	DBHost                 string
+	DBPort                 string
 	DBName                 string
 	JWTExpirationInSeconds int64
 	JWTSecret              string
@@ -29,8 +29,9 @@ func initConfig() Config {
 		Port:                   getEnv("PORT", "8080"),
 		DBUser:                 getEnv("DB_USER", "root"),
 		DBPassword:             getEnv("DB_PASSWORD", "mypassword"),
-		DBAddress:              fmt.Sprintf("%s:%s", getEnv("DB_HOST", "127.0.0.1"), getEnv("DB_PORT", "3306")),
-		DBName:                 getEnv("DB_NAME", "go-ecommerce"),
+		DBHost:                 getEnv("DB_HOST", "127.0.0.1"),
+		DBPort:                 getEnv("DB_PORT", "3306"),
+		DBName:                 getEnv("DB_NAME", "go_ecommerce"),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXP", 3600*24*7),
 		JWTSecret:              getEnv("JWT_SECRET", "not-secret-anymore"),
 	}

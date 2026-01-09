@@ -2,24 +2,17 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/ChrisBryann/go-ecommerce/cmd/api"
 	"github.com/ChrisBryann/go-ecommerce/config"
 	"github.com/ChrisBryann/go-ecommerce/db"
-	"github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	db, err := db.NewMySQLStorage(mysql.Config{
-		User:                 config.Envs.DBUser,
-		Passwd:               config.Envs.DBPassword,
-		Addr:                 config.Envs.DBAddress,
-		DBName:               config.Envs.DBName,
-		Net:                  "tcp",
-		AllowNativePasswords: true,
-		ParseTime:            true,
-	})
+
+	db, err := db.NewPGXStorage(db.GenerateConnectionString(config.Envs.DBHost, config.Envs.DBPort, config.Envs.DBName, config.Envs.DBUser, config.Envs.DBPassword))
 
 	if err != nil {
 		log.Fatal(err)
@@ -27,7 +20,7 @@ func main() {
 
 	initStorage(db)
 
-	server := api.NewAPIServer(":8080", db)
+	server := api.NewAPIServer(fmt.Sprintf(":%s", config.Envs.Port), db)
 
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
